@@ -5,11 +5,6 @@ from config import Config
 from database import db
 import eventlet
 
-# Import Routes
-from routes.auth import auth_bp
-from routes.chat import chat_bp
-from routes.match import match_bp
-
 # Initialize Flask App
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -20,6 +15,11 @@ db.init_app(app)
 
 # Initialize SocketIO
 socketio = SocketIO(app, cors_allowed_origins="*", async_mode="eventlet")
+
+# Import Routes AFTER initializing `socketio`
+from routes.auth import auth_bp
+from routes.chat import chat_bp
+from routes.match import match_bp
 
 # Register Blueprints
 app.register_blueprint(auth_bp, url_prefix="/auth")
