@@ -1,9 +1,11 @@
+import eventlet
+eventlet.monkey_patch()  # Apply monkey patching before importing anything
+
 from flask import Flask
 from flask_cors import CORS
 from flask_socketio import SocketIO
 from config import Config
-from database import db
-import eventlet
+from database import db
 
 # Initialize Flask App
 app = Flask(__name__)
