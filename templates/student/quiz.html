@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    <h1>Quiz</h1>
+    <div id="question-box">
+        <p id="question-text"></p>
+        <button class="option-btn" id="option1"></button>
+        <button class="option-btn" id="option2"></button>
+        <button class="option-btn" id="option3"></button>
+        <button class="option-btn" id="option4"></button>
+    </div>
+    <button id="next-btn">Next</button>
+</body>
+</html>
