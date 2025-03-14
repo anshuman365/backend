@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="auth-container">
+    <div class="auth-form">
+        <h2>Login</h2>
+        <form method="POST">
+            <input type="email" name="email" placeholder="Email" required>
+            <input type="password" name="password" placeholder="Password" required>
+            <button type="submit">Login</button>
+        </form>
+        <p>Don't have an account? <a href="{{ url_for('main.register') }}">Register here</a></p>
+        <div class="text-center mt-2">
+    <a href="{{ url_for('main.reset_password_request') }}"><p style="color: red;">Forgot Password?</p></a>
+</div>
+    </div>
+</div>
+{% endblock %}

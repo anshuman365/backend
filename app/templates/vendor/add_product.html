@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Add New Product</h2>
+<form method="POST" enctype="multipart/form-data" class="form-container">
+    <label>Product Name</label>
+    <input type="text" name="name" required>
+
+    <label>Description</label>
+    <textarea name="description" required></textarea>
+
+    <label>Price</label>
+    <input type="number" step="0.01" name="price" required>
+
+    <label>Stock</label>
+    <input type="number" name="stock" required>
+
+    <label>Category</label>
+    <input type="text" name="category" required>
+
+    <label>Product Image</label>
+    <input type="file" name="image" id="image">
+
+    <button type="submit" class="btn">Add Product</button>
+</form>
+{% endblock %}

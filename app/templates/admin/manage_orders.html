@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Manage Orders</h2>
+<table class="orders-table">
+    <tr><th>Order ID</th><th>Customer</th><th>Total Price</th><th>Status</th><th>Actions</th></tr>
+    {% for order in orders %}
+    <tr>
+        <td>{{ order.id }}</td>
+        <td>{{ order.user.username }}</td>
+        <td>${{ order.total_price }}</td>
+        <td>{{ order.status }}</td>
+        <td>
+            <a href="{{ url_for('main.update_order', order_id=order.id, status='shipped') }}" class="btn">Mark as Shipped</a>
+            <a href="{{ url_for('main.update_order', order_id=order.id, status='delivered') }}" class="btn">Mark as Delivered</a>
+            <a href="{{ url_for('main.update_order', order_id=order.id, status='canceled') }}" class="btn">Cancel Order</a>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}
