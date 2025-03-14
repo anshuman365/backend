@@ -7,22 +7,21 @@ from flask_mail import Mail
 from flask_cors import CORS
 from app.config import Config
 import os
-#from app.models import User
-app = Flask(__name__)
-db = SQLAlchemy()
-#login_manager = LoginManager()
-bcrypt = Bcrypt()
-mail = Mail(app)
-migrate = Migrate()
 
-login_manager = LoginManager(app)
+db = SQLAlchemy()
+login_manager = LoginManager()
+bcrypt = Bcrypt()
+mail = Mail()
+migrate = Migrate()
 
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
-    app.config["UPLOAD_FOLDER"]="app/static/images"
+    app.config["UPLOAD_FOLDER"] = "app/static/images"
+
     if not os.path.exists('app/static/images'):
         os.makedirs('app/static/images')
+
     db.init_app(app)
     login_manager.init_app(app)
     bcrypt.init_app(app)
@@ -30,12 +29,8 @@ def create_app():
     migrate.init_app(app, db)
     CORS(app)
 
+    # Import blueprints
     from app.routes import main
     app.register_blueprint(main)
-    
+
     return app
-    
-
-
-
-

@@ -1,6 +1,6 @@
 from flask import session
 from flask_mail import Message
-from app import mail, app
+from app import mail
 from flask import current_app, url_for
 from app.models import Product
 from itsdangerous import URLSafeTimedSerializer
