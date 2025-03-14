@@ -146,7 +146,7 @@ def send_email(subject, receiver_email, body, cc_emails=None, bcc_emails=None, a
             bcc_emails = []
 
         # Attach email body (HTML or Plain Text)
-        msg.attach(MIMEText(body, 'html', charset='utf-8'))
+        msg.attach(MIMEText(body, 'html', 'utf-8'))
 
         # Use 'plain' for simple text emails
         # Attach a file if provided
