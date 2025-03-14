@@ -34,14 +34,15 @@ def register():
         username = request.form["username"]
         email = request.form["email"]
         password = bcrypt.generate_password_hash(request.form["password"]).decode('utf-8')
-        user = User(username=username, email=email, password=password)
+        role=request.form["role"]
+        user = User(username=username, email=email, password=password,role=role)
         db.session.add(user)
         db.session.commit()
         flash("Registration successful!", "success")
         return redirect(url_for('main.login'))
     return render_template("auth/register.html")
 
-@main.route("/login", methods=["GET", "POST"])
+@main.route("/login", method=["GET", "POST"])
 def login():
     if request.method == "POST":
         email = request.form["email"]
