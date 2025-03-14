@@ -1,0 +1,143 @@
+Upcoming maintenance
+We will be upgrading critical infrastructure on March 20th, 4:30 am GMT+5:30 (March 19th, 11:00 pm UTC). Follow our status page for updates.
+
+
+N
+Nexora's workspace
+e-commerce_database
+Menu
+
+Search
+Ctrl+
+K
+
+New
+
+
+n
+Dashboard
+e-commerce_database
+Info
+Monitor
+Logs
+Metrics
+Manage
+Apps
+Recovery
+
+Changelog
+Invite a friend
+
+Contact support
+Render Status
+PostgreSQL
+e-commerce_database
+Free
+Upgrade your instance
+View docs
+
+Connect
+Info
+Your database will expire on April 13, 2025. The database will be deleted unless you upgrade to a paid instance type.
+General
+Name
+A unique name for your database.
+
+e-commerce_database
+
+Edit
+Created
+41 minutes ago
+Status
+available
+PostgreSQL Version
+16
+Region
+Oregon (US West)
+Read Replicas
+
+Add Read Replica
+Storage
+4.8% used out of 1 GB
+Database storage
+Datadog API Key
+
+Add Datadog API Key
+PostgreSQL Instance
+Instance Type
+Free
+256 MB
+ RAM
+100m
+ CPU
+1 GB
+ Storage
+Update
+A credit card is required to change instance types.
+Add payment information
+High Availability
+Run a standby instance of your database and automatically fail over to it if the primary encounters an issue.
+
+
+Disabled
+Only available for Pro instances and higher.
+See upgrade options
+Connections
+Hostname
+An internal hostname used by your Render services.
+
+dpg-cva14gpc1ekc738orhn0-a
+
+Port
+5432
+
+Database
+e_commerce_database_83mb
+
+Username
+e_commerce_database_83mb_user
+
+Password
+w3ApiBl9lcavvc17VpmAh7ykgIdwod0a
+
+
+Internal Database URL
+postgresql://e_commerce_database_83mb_user:w3ApiBl9lcavvc17VpmAh7ykgIdwod0a@dpg-cva14gpc1ekc738orhn0-a/e_commerce_database_83mb
+
+
+External Database URL
+postgresql://e_commerce_database_83mb_user:w3ApiBl9lcavvc17VpmAh7ykgIdwod0a@dpg-cva14gpc1ekc738orhn0-a.oregon-postgres.render.com/e_commerce_database_83mb
+
+
+PSQL Command
+PGPASSWORD=w3ApiBl9lcavvc17VpmAh7ykgIdwod0a psql -h dpg-cva14gpc1ekc738orhn0-a.oregon-postgres.render.com -U e_commerce_database_83mb_user e_commerce_database_83mb
+
+
+Access Control
+1 IP range is allowed from outside of your private network.
+
+Sources are specified CIDR block notation.
+
+Source
+Description
+0.0.0.0/0
+everywhere
+
+Validate IP address
+0.0.0.0
+
+Add source
+Cancel
+Save
+
+Delete Database
+
+Restart Database
+
+Suspend Database
+0 services selected:
+
+Move
+
+Generate Blueprint
+
