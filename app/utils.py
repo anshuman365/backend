@@ -1,6 +1,7 @@
-from flask import session, url_for, current_app
+from flask import session
 from flask_mail import Message
 from app import mail
+from flask import current_app, url_for
 from app.models import Product
 from itsdangerous import URLSafeTimedSerializer
 import smtplib
@@ -16,39 +17,27 @@ MAIL_USERNAME = Config.MAIL_USERNAME
 MAIL_PASSWORD = Config.MAIL_PASSWORD
 SMTP_SERVER = Config.MAIL_SERVER
 SMTP_PORT = Config.MAIL_PORT
+#SMTP_SERVER, SMTP_PORT, EMAIL_ADDRESS, EMAIL_PASSWORD
 EMAIL_ADDRESS = Config.MAIL_USERNAME
 EMAIL_PASSWORD = Config.MAIL_PASSWORD
 
-# ✅ Calculate Total Cart Price
 def calculate_cart_total():
+    """Calculate the total price of items in the cart."""
     total = 0
     if 'cart' in session:
         for item in session['cart'].values():
             total += item['price'] * item['quantity']
     return total
 
-# ✅ Role Checks
 def is_admin(user):
+    """Check if the logged-in user is an admin."""
     return user.role == 'admin'
 
 def is_vendor(user):
+    """Check if the logged-in user is a vendor."""
     return user.role == 'vendor'
 
-# ✅ Generate Secure Token
-def generate_reset_token(email):
-    serializer = URLSafeTimedSerializer(current_app.config["SECRET_KEY"])
-    return serializer.dumps(email, salt=current_app.config["SECURITY_PASSWORD_SALT"])
 
-# ✅ Verify Reset Token
-def verify_reset_token(token, expiration=1800):
-    serializer = URLSafeTimedSerializer(current_app.config["SECRET_KEY"])
-    try:
-        email = serializer.loads(token, salt=current_app.config["SECURITY_PASSWORD_SALT"], max_age=expiration)
-        return email
-    except:
-        return None
-
-# ✅ Order Confirmation Email with Nexora Branding
 def send_order_confirmation(user_email, order_details):
     subject = "🛍️ Order Confirmation - Nexora Industry"
     body = f"""
@@ -69,7 +58,6 @@ def send_order_confirmation(user_email, order_details):
     """
     return send_email(subject, user_email, body)
 
-# ✅ Password Reset Email with Nexora Branding
 def send_password_reset_email(user_email, reset_link):
     subject = "🔐 Password Reset Request - Nexora Industry"
     body = f"""
@@ -91,13 +79,28 @@ def send_password_reset_email(user_email, reset_link):
     </html>
     """
     return send_email(subject, user_email, body)
+    
 
+
+def generate_reset_token(email):
+    serializer = URLSafeTimedSerializer(current_app.config["SECRET_KEY"])
+    return serializer.dumps(email, salt=current_app.config["SECURITY_PASSWORD_SALT"])
+
+def verify_reset_token(token, expiration=1800):
+    serializer = URLSafeTimedSerializer(current_app.config["SECRET_KEY"])
+    try:
+        email = serializer.loads(token, salt=current_app.config["SECURITY_PASSWORD_SALT"], max_age=expiration)
+        return email
+    except:
+        return None
 
 def send_reset_email(email, token):
     reset_url = url_for('main.reset_password', token=token, _external=True)
-    
-    subject = "🔐 Password Reset Request - Nexora Industry"
-    body = f"""
+    msg = MIMEMultipart()
+    msg['From'] = EMAIL_ADDRESS
+    msg['To'] = email
+    msg['Subject'] = "🔐 Password Reset Request - Nexora Industry"
+    msg.attach(MIMEText(f"""
     <html>
     <body style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px;">
         <div style="max-width: 600px; background: white; padding: 20px; border-radius: 10px; box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);">
@@ -114,19 +117,27 @@ def send_reset_email(email, token):
         </div>
     </body>
     </html>
-    """
+    """, 'html'))
+    try:
+        with smtplib.SMTP('smtp.gmail.com', 587) as smtp:
+            smtp.starttls()
+            smtp.login(EMAIL_ADDRESS, EMAIL_PASSWORD)
+            smtp.send_message(msg)
+    except Exception as e:
+        print(f"Email sending failed: {e}")
+    
 
-    return send_email(subject, email, body)
-        
-        
-# ✅ Send Email with HTML, Attachments, and Error Handling
+
+
 def send_email(subject, receiver_email, body, cc_emails=None, bcc_emails=None, attachment_path=None):
     try:
+        # Create Email Message
         msg = MIMEMultipart()
         msg['From'] = EMAIL_ADDRESS
         msg['To'] = receiver_email
         msg['Subject'] = subject
 
+        # Add CC and BCC
         if cc_emails:
             msg['Cc'] = ', '.join(cc_emails)
         if bcc_emails:
@@ -134,8 +145,11 @@ def send_email(subject, receiver_email, body, cc_emails=None, bcc_emails=None, a
         else:
             bcc_emails = []
 
-        msg.attach(MIMEText(body, 'html'))  # Attach HTML body
+        # Attach email body (HTML or Plain Text)
+        msg.attach(MIMEText(body, 'html'))
 
+        # Use 'plain' for simple text emails
+        # Attach a file if provided
         if attachment_path:
             filename = os.path.basename(attachment_path)
             with open(attachment_path, "rb") as attachment:
@@ -145,16 +159,18 @@ def send_email(subject, receiver_email, body, cc_emails=None, bcc_emails=None, a
                 part.add_header("Content-Disposition", f"attachment; filename={filename}")
                 msg.attach(part)
 
-        # SMTP Connection & Sending Email
+        # Connect to SMTP Server
         context = ssl.create_default_context()
         with smtplib.SMTP(SMTP_SERVER, SMTP_PORT) as server:
             server.ehlo()
+            # Identifies itself to the SMTP server
             server.starttls(context=context)
+            # Secure connection upgrade
             server.ehlo()
             server.login(EMAIL_ADDRESS, EMAIL_PASSWORD)
+            # Login
             server.sendmail(EMAIL_ADDRESS, [receiver_email] + (cc_emails or []) + bcc_emails, msg.as_string())
             print("✅ Email sent successfully!")
-    
     except smtplib.SMTPAuthenticationError:
         print("❌ Authentication Error! Check your email and password.")
     except smtplib.SMTPConnectError:
@@ -163,3 +179,4 @@ def send_email(subject, receiver_email, body, cc_emails=None, bcc_emails=None, a
         print("❌ Email address rejected by the server.")
     except Exception as e:
         print(f"❌ Error: {e}")
+        
