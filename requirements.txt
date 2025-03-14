@@ -10,4 +10,5 @@ WTForms
 Flask-WTF
 itsdangerous
 Werkzeug
+psycopg2-binary
 gunicorn
