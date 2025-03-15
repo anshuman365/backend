@@ -1,4 +1,5 @@
 from flask import Blueprint, request, jsonify
+import os
 import pickle
 
 review_api = Blueprint('review_api', __name__)
@@ -15,3 +16,16 @@ def detect_fake_review():
     prediction = model.predict(vectorized_text)
 
     return jsonify({'fake_review': bool(prediction[0] == 0)})
+    
+
+# Get absolute path
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+MODEL_PATH = os.path.join(BASE_DIR, '../models/fake_review_model.pkl')
+
+# Load Model
+try:
+    with open(MODEL_PATH, 'rb') as f:
+        vectorizer, model = pickle.load(f)
+    print("✅ Model loaded successfully!")
+except FileNotFoundError:
+    print(f"❌ Model file not found at: {MODEL_PATH}")

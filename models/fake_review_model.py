@@ -1,34 +1,23 @@
-import numpy as np
-import tensorflow as tf
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Embedding, LSTM, Dense, GlobalAveragePooling1D
-from tensorflow.keras.preprocessing.text import Tokenizer
-from tensorflow.keras.preprocessing.sequence import pad_sequences
+import os
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.naive_bayes import MultinomialNB
 import pickle
 
-# Sample dataset
-reviews = ["This product is great!", "Worst experience ever", "Amazing!", "Not worth the price", "Highly recommended"]
-labels = np.array([1, 0, 1, 0, 1])  # 1 = Real, 0 = Fake
+# Ensure that the "models" directory exists
+os.makedirs('models', exist_ok=True)
 
-# Tokenize and pad sequences
-tokenizer = Tokenizer(num_words=1000, oov_token="<OOV>")
-tokenizer.fit_on_texts(reviews)
-X = tokenizer.texts_to_sequences(reviews)
-X = pad_sequences(X, maxlen=10)
+# Load dataset
+reviews = ["This product is great!", "Worst experience ever", "Amazing!"]
+labels = [1, 0, 1]
 
-# Define LSTM Model
-model = Sequential([
-    Embedding(input_dim=1000, output_dim=64, input_length=10),
-    LSTM(64, return_sequences=True),
-    GlobalAveragePooling1D(),
-    Dense(32, activation='relu'),
-    Dense(1, activation='sigmoid')
-])
+vectorizer = TfidfVectorizer()
+X = vectorizer.fit_transform(reviews)
 
-model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
-model.fit(X, labels, epochs=10, verbose=1)
+model = MultinomialNB()
+model.fit(X, labels)
 
-# Save model and tokenizer
-model.save('fake_review_model.h5')
-with open('tokenizer.pkl', 'wb') as f:
-    pickle.dump(tokenizer, f) 
+# Save the model in the "models" directory
+with open('models/fake_review_model.pkl', 'wb') as f:
+    pickle.dump((vectorizer, model), f)
+
+print("✅ Model saved successfully in 'models/fake_review_model.pkl'")
