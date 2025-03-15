@@ -1,0 +1,11 @@
+flask
+numpy
+pandas
+sklearn
+nltk
+tensorflow
+sqlalchemy
+psycopg2
+flask-wtf
+flask-login
+flask-bcrypt

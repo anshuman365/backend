@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Dashboard</title>
+</head>
+<body>
+    <h1>Admin Dashboard</h1>
+    <p>Monitor fraudulent activities here.</p>
+    <canvas id="fraudChart"></canvas>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+fetch('/fraud_report').then(response => response.json()).then(data => {
+    new Chart(document.getElementById('fraudChart'), {
+        type: 'bar',
+        data: {
+            labels: ['Fake Reviews', 'Fraud Transactions', 'Scam Reports'],
+            datasets: [{
+                label: 'Detected Cases',
+                data: [data.fake_reviews, data.fraud_transactions, data.scams],
+                backgroundColor: ['red', 'blue', 'orange']
+            }]
+        }
+    });
+});
+</script>
+</body>
+</html>
