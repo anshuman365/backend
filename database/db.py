@@ -1,12 +1,10 @@
-from flask_bcrypt import Bcrypt
-from config import config
 import psycopg2
+from config import config
 
-bcrypt = Bcrypt()
-conn = psycopg2.connect(config.DATABASE_URI)
-cursor = conn.cursor()
+try:
+    conn = psycopg2.connect(config.DATABASE_URI)
+    cursor = conn.cursor()
+    print("✅ Successfully connected to PostgreSQL Database!")
 
-def create_admin(username, password):
-    hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
-    cursor.execute("INSERT INTO admin (username, password) VALUES (%s, %s)", (username, hashed_password))
-    conn.commit()
+except Exception as e:
+    print(f"❌ Database Connection Failed: {e}")
