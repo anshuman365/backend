@@ -11,16 +11,17 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from email.mime.base import MIMEBase
 from email import encoders
+from email.header import Header
 from app.config import Config
 
 MAIL_USERNAME = Config.MAIL_USERNAME
 MAIL_PASSWORD = Config.MAIL_PASSWORD
 SMTP_SERVER = Config.MAIL_SERVER
 SMTP_PORT = Config.MAIL_PORT
-#SMTP_SERVER, SMTP_PORT, EMAIL_ADDRESS, EMAIL_PASSWORD
 EMAIL_ADDRESS = Config.MAIL_USERNAME
 EMAIL_PASSWORD = Config.MAIL_PASSWORD
 
+# 🛒 Cart total calculation
 def calculate_cart_total():
     """Calculate the total price of items in the cart."""
     total = 0
@@ -29,34 +30,12 @@ def calculate_cart_total():
             total += item['price'] * item['quantity']
     return total
 
+# 👤 Role-based access checks
 def is_admin(user):
-    """Check if the logged-in user is an admin."""
     return user.role == 'admin'
 
 def is_vendor(user):
-    """Check if the logged-in user is a vendor."""
     return user.role == 'vendor'
-
-
-def send_order_confirmation(user_email, order_details):
-    subject = "🛍️ Order Confirmation - Nexora Industry"
-    body = f"""
-    <html>
-    <body style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px;">
-        <div style="max-width: 600px; background: white; padding: 20px; border-radius: 10px; box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);">
-            <h2 style="color: #2E86C1; text-align: center;">Nexora Industry</h2>
-            <h3 style="color: #28a745; text-align: center;">🎉 Your Order is Confirmed!</h3>
-            <p style="font-size: 16px; color: #333;">Hello,</p>
-            <p style="font-size: 16px; color: #333;">Thank you for shopping with <b>Nexora Industry</b>. Below are your order details:</p>
-            <pre style="background: #f8f9fa; padding: 15px; border-radius: 5px; font-size: 14px; color: #333;">{order_details}</pre>
-            <p style="font-size: 16px; color: #333;">We appreciate your business and look forward to serving you again! 🚀</p>
-            <hr>
-            <p style="font-size: 14px; text-align: center; color: #777;">This is an automated email from Nexora Industry.</p>
-        </div>
-    </body>
-    </html>
-    """
-    return send_email(subject, user_email, body)
 
 def send_password_reset_email(user_email, reset_link):
     subject = "🔐 Password Reset Request - Nexora Industry"
@@ -81,7 +60,7 @@ def send_password_reset_email(user_email, reset_link):
     return send_email(subject, user_email, body)
     
 
-
+# 🔑 Password Reset Functions
 def generate_reset_token(email):
     serializer = URLSafeTimedSerializer(current_app.config["SECRET_KEY"])
     return serializer.dumps(email, salt=current_app.config["SECURITY_PASSWORD_SALT"])
@@ -93,6 +72,31 @@ def verify_reset_token(token, expiration=1800):
         return email
     except:
         return None
+
+
+# 📩 Send Order Confirmation Email
+def send_order_confirmation(user_email, order_details):
+    print(f"📩 Sending order confirmation to: {user_email}")  # Debug log
+    subject = "Order Confirmation - Nexora Industry 🎉"
+    subject = str(Header(subject, 'utf-8'))  # Ensure UTF-8 subject encoding
+
+    body = f""" 
+    <html> 
+    <body style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px;"> 
+    <div style="max-width: 600px; background: white; padding: 20px; border-radius: 10px; box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);">
+    <h2 style="color: #2E86C1; text-align: center;">Nexora Industry</h2> 
+    <h3 style="color: #28a745; text-align: center;">🎉 Your Order is Confirmed!</h3> 
+    <p style="font-size: 16px; color: #333;">Hello,</p> 
+    <p style="font-size: 16px; color: #333;">Thank you for shopping with <b>Nexora Industry</b>. Below are your order details:</p> 
+    <pre style="background: #f8f9fa; padding: 15px; border-radius: 5px; font-size: 14px; color: #333;">{order_details}</pre> 
+    <p style="font-size: 16px; color: #333;">We appreciate your business and look forward to serving you again! 🚀</p> 
+    <hr> 
+    <p style="font-size: 14px; text-align: center; color: #777;">This is an automated email from Nexora Industry.</p> 
+    </div> 
+    </body> 
+    </html> 
+    """
+    return send_email(subject, user_email, body)
 
 def send_reset_email(email, token):
     reset_url = url_for('main.reset_password', token=token, _external=True)
@@ -127,17 +131,19 @@ def send_reset_email(email, token):
         print(f"Email sending failed: {e}")
     
 
-
-
+# 📧 General Email Sending Function
 def send_email(subject, receiver_email, body, cc_emails=None, bcc_emails=None, attachment_path=None):
+    print(f"📤 Sending email to: {receiver_email}")  # Debug log
+
     try:
-        # Create Email Message
+        # ✉️ Create Email Message
         msg = MIMEMultipart()
         msg['From'] = EMAIL_ADDRESS
         msg['To'] = receiver_email
-        msg['Subject'] = subject
+        msg['Subject'] = str(Header(subject, 'utf-8'))  # Ensure UTF-8 encoding
+        print("✅ Subject set properly!")
 
-        # Add CC and BCC
+        # 📨 Add CC and BCC
         if cc_emails:
             msg['Cc'] = ', '.join(cc_emails)
         if bcc_emails:
@@ -145,11 +151,11 @@ def send_email(subject, receiver_email, body, cc_emails=None, bcc_emails=None, a
         else:
             bcc_emails = []
 
-        # Attach email body (HTML or Plain Text)
-        msg.attach(MIMEText(body, 'html', 'utf-8'))
+        print("✅ Adding email body...")
+        # Attach email body (HTML format)
+        msg.attach(MIMEText(body.encode('utf-8'), 'html', 'utf-8'))  # Encode explicitly
 
-        # Use 'plain' for simple text emails
-        # Attach a file if provided
+        # 📎 Attach a file if provided
         if attachment_path:
             filename = os.path.basename(attachment_path)
             with open(attachment_path, "rb") as attachment:
@@ -159,18 +165,17 @@ def send_email(subject, receiver_email, body, cc_emails=None, bcc_emails=None, a
                 part.add_header("Content-Disposition", f"attachment; filename={filename}")
                 msg.attach(part)
 
-        # Connect to SMTP Server
+        print("🌐 Connecting to SMTP server...")
+        # 🔒 Connect to SMTP Server
         context = ssl.create_default_context()
         with smtplib.SMTP(SMTP_SERVER, SMTP_PORT) as server:
             server.ehlo()
-            # Identifies itself to the SMTP server
             server.starttls(context=context)
-            # Secure connection upgrade
             server.ehlo()
             server.login(EMAIL_ADDRESS, EMAIL_PASSWORD)
-            # Login
-            server.sendmail(EMAIL_ADDRESS, [receiver_email] + (cc_emails or []) + bcc_emails, msg.as_string())
+            server.sendmail(EMAIL_ADDRESS, [receiver_email] + (cc_emails or []) + bcc_emails, msg.as_string().encode('utf-8'))  # Ensure UTF-8 encoding
             print("✅ Email sent successfully!")
+
     except smtplib.SMTPAuthenticationError:
         print("❌ Authentication Error! Check your email and password.")
     except smtplib.SMTPConnectError:
@@ -179,4 +184,3 @@ def send_email(subject, receiver_email, body, cc_emails=None, bcc_emails=None, a
         print("❌ Email address rejected by the server.")
     except Exception as e:
         print(f"❌ Error: {e}")
-        
