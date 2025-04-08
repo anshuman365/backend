@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Study Calendar - April 2025</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<div id="real-datetime" style="font-size:18px; font-weight:bold; margin-bottom: 10px;"></div>
+
+<h2>April 2025 Monthly Study Schedule</h2>
+<table>
+    <thead>
+        <tr>
+            <th>Date</th>
+            <th>Physics</th>
+            <th>Chemistry</th>
+            <th>Maths</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for date, subjects in month_schedule.items() %}
+        <tr onclick="loadDaySchedule('{{ date }}')">
+            <td>{{ date }}</td>
+            <td>{{ subjects.physics }}</td>
+            <td>{{ subjects.chemistry }}</td>
+            <td>{{ subjects.maths }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<div id="detail-section" style="display:none; margin-top: 20px;">
+    <h3>Detailed Schedule for <span id="selected-date"></span></h3>
+    <ul id="day-details"></ul>
+
+
+</div>
+
+<div id="current-task-bar" style="margin-top: 25px; font-weight: bold;">
+    Current Task: <span id="live-task">Loading...</span>
+</div>
+
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
